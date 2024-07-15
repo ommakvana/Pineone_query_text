@@ -86,39 +86,37 @@ def query():
                 url = result['id']
                 text, title = fetch_data_from_url(url)
 
-                if text:
-                    output += f"URL: {url}\n\n"
+                output += f"URL: {url}\n"
+                output += '-' * 50 + '\n'
 
-                    # Collecting all matching instances
-                    found_matching = False
+                if text:
                     matching_words = []
 
                     for paragraph in text.split("\n\n"):
                         if query_text.lower() in paragraph.lower():
                             start_idx = paragraph.lower().index(query_text.lower())
                             matching_words.append(query_text)
-
-                            # Extracting similar words (for demo purposes, we'll just use a simple approach)
                             similar_words = [word for word in paragraph.split() if query_text.lower() in word.lower()]
                             matching_words.extend(similar_words)
 
                     if matching_words:
-                        for match in set(matching_words):  # Use set to avoid duplicates
+                        for match in set(matching_words):
                             output += f"Matching text: '{match}'\n"
-                            output += f"Score: {score:.2f}, Percentage: {percentage:.2f}%\n\n"
-                            found_matching = True
+                    else:
+                        output += "No exact matches found.\n"
 
-                    if not found_matching:
-                        output += "No exact matches found.\n\n"
+                    output += f"Score: {score:.2f}, Percentage: {percentage:.2f}%\n\n"
                 else:
                     output += f"Error fetching content from {url}\n"
+
+                output += '-' * 50 + '\n'
+
         else:
             output += f"No matches found for '{query_text}'."
     else:
         output += "Error embedding the query text."
 
     return jsonify({"message": output})
-
 
 
 if __name__ == "__main__":
@@ -154,4 +152,4 @@ if __name__ == "__main__":
 
     process_urls(urls)
 
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=5000, debug=True)

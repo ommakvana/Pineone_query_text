@@ -3,16 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Query Pinecone</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <title>Pinecone Query Tool</title>
+    <link rel="stylesheet" href="static/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
 </head>
 <body>
     <div class="container">
         <h1>Pinecone Query Tool</h1>
-        <input type="text" id="query-input" placeholder="Enter your query here" />
-        <button id="submit-btn">Submit</button>
-        <pre id="output"></pre>
+        <div class="input-card">
+            <h2>Submit Your Query</h2>
+            <div class="input-group">
+                <input type="text" id="query-input" placeholder="Enter your query here" />
+                <button id="submit-btn">Submit</button>
+            </div>
+        </div>
+        <div class="output-card">
+            <h2>Query Results</h2>
+            <div class="output-box">
+                <pre id="output"></pre>
+            </div>
+        </div>
     </div>
-    <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <script src="static/script.js"></script>
 </body>
 </html>
