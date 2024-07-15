@@ -137,6 +137,19 @@ if __name__ == "__main__":
         "https://www.nature.com/",
         "https://www.isro.gov.in/",
         "https://timesofindia.indiatimes.com/"
+        "https://www.wsj.com/",
+        "https://ai.googleblog.com/",
+        "https://www.cnbc.com/",
+        "https://www.un.org/",
+        "https://www.nih.gov/",
+        "https://www.sciencemag.org/",
+        "https://www.theatlantic.com/",
+        "https://www.bloomberg.com/",
+        "https://www.lonelyplanet.com/",
+        "https://www.gamespot.com/",
+        "https://www.ign.com/",
+        "https://www.cnet.com/",
+        "https://logbinary.com/"
     ]
 
     process_urls(urls)
