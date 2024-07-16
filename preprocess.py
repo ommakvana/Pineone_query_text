@@ -2,17 +2,17 @@ import asyncio
 import aiohttp
 from bs4 import BeautifulSoup
 from sentence_transformers import SentenceTransformer
-from pinecone import Pinecone, ServerlessSpec
+from pinecone import Pinecone
+import json
 
 # Pinecone setup
 api_key = "516cbfbd-5e65-4050-b31e-5ff69efa9f23"
 pc = Pinecone(api_key=api_key, environment="us-east-1")
-index_name = "example-index-2"
-
+index_name = "example-index"
 index = pc.Index(index_name)
 
 # Setup model
-model = SentenceTransformer('paraphrase-MiniLM-L6-v2')
+model = SentenceTransformer('all-mpnet-base-v2')
 
 async def fetch_data_from_url(url):
     try:
@@ -35,38 +35,37 @@ def embed_text(text):
 
 async def upload_to_pinecone(data):
     embeddings = []
+    all_text_data = {}
 
     for url, (text, _) in data.items():
+        all_text_data[url] = text
         embedding = embed_text(text)
         if embedding is not None:
             embeddings.append({
                 "id": url,
                 "values": embedding.tolist(),
-                # "metadata": {"text": text}
             })
-            print(f"Embedding for {url}")
+            print(f"Embedding for {url}")  # Log embedding
 
     try:
         index.upsert(vectors=embeddings)
         print("Upload successful.")
+        
+        with open("fetched_data.json", "w") as f:
+            json.dump(all_text_data, f)
     except Exception as e:
         print(f"Error upserting vectors to Pinecone index: {e}")
 
+
 async def process_urls(urls):
     data = {}
-    
-    # Create a list of tasks for concurrent fetching
     tasks = [fetch_data_from_url(url) for url in urls]
-    
-    # Run all tasks concurrently and wait for them to complete
     results = await asyncio.gather(*tasks)
 
-    # Store the results in the data dictionary
     for url, (text, title) in zip(urls, results):
         if text:
             data[url] = (text, title)
 
-    # Upload the data to Pinecone
     await upload_to_pinecone(data)
 
 if __name__ == "__main__":
@@ -78,7 +77,6 @@ if __name__ == "__main__":
         "https://pytorch.org/",
         "https://openai.com/",
         "https://hbr.org/",
-        "https://logbinary.com/",
         "https://www.discovery.com/",
         "https://www.nytimes.com/",
         "https://www.nationalgeographic.com/",
