@@ -10,7 +10,8 @@ document.addEventListener("DOMContentLoaded", function() {
         })
         .then(response => response.json())
         .then(data => {
-            document.getElementById('output').innerText = data.message;
+            // Use innerHTML to render HTML content
+            document.getElementById('output').innerHTML = data.message;
         })
         .catch(error => {
             document.getElementById('output').innerText = 'Error occurred while processing the query.';

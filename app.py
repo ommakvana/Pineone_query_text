@@ -2,6 +2,7 @@ from flask import Flask, request, jsonify, render_template
 from sentence_transformers import SentenceTransformer
 from pinecone import Pinecone
 import json
+import re
 
 app = Flask(__name__)
 
@@ -29,6 +30,10 @@ def embed_text(text):
 def home():
     return render_template('index.html')
 
+from flask import Flask, request, render_template_string
+import re
+import json
+
 @app.route('/query', methods=['POST'])
 def query():
     query_text = request.json.get('query_text', '')
@@ -52,15 +57,25 @@ def query():
                     output_lines.append('-' * 50)
 
                     if text:
-                        matching_words = set()
+                        matching_paragraphs = []
                         for paragraph in text.split("\n\n"):
                             if query_text.lower() in paragraph.lower():
-                                matching_words.add(query_text)
-                                similar_words = [word for word in paragraph.split() if query_text.lower() in word.lower()]
-                                matching_words.update(similar_words)
+                                # Bold the matching word using regex
+                                highlighted_paragraph = re.sub(
+                                    f"({re.escape(query_text)})",
+                                    r"<strong>\1</strong>",
+                                    paragraph,
+                                    flags=re.IGNORECASE
+                                )
+                                matching_paragraphs.append(highlighted_paragraph)
 
-                        for match in matching_words:
-                            output_lines.append(f"Matching text: '{match}'")
+                        if matching_paragraphs:
+                            output_lines.append("Matching paragraphs:")
+                            for match in matching_paragraphs:
+                                output_lines.append(f"{match}")
+                        else:
+                            output_lines.append("No matching paragraphs found.")
+
                         output_lines.append(f"Score: {score:.2f}, Percentage: {percentage:.2f}%")
                     else:
                         output_lines.append(f"Error fetching content from {url}")
@@ -75,6 +90,7 @@ def query():
         output_lines.append("Error embedding the query text.")
 
     return jsonify({"message": "\n".join(output_lines)})
+
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=5000, debug=True)
